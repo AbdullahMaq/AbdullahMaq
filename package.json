@@ -1,0 +1,30 @@
+{
+  "name": "stopit-harassment",
+  "version": "1.0.0",
+  "description": "Emergency safety PWA with offline capabilities and Bluetooth alerts",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000",
+    "build": "echo 'No build process needed for this PWA'",
+    "test": "echo 'Tests not implemented yet'"
+  },
+  "keywords": [
+    "emergency",
+    "safety",
+    "pwa",
+    "offline",
+    "bluetooth",
+    "sos"
+  ],
+  "author": "StopitHarassment Team",
+  "license": "MIT",
+  "dependencies": {
+    "firebase": "^10.7.1"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "."
+  }
+}

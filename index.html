@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#e94560">
+    <meta name="description" content="Emergency safety app with offline SOS and Bluetooth alerts">
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/icon-32x32.png" sizes="32x32">
+    <link rel="apple-touch-icon" href="icons/icon-180x180.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="StopitHarassment">
+    
+    <!-- Security -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https:">
+    
+    <title>StopitHarassment - Emergency Safety</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <h2>StopitHarassment</h2>
+        <p>Initializing safety features...</p>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="app-container" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>🛡️ StopitHarassment</h1>
+            <div class="status-indicators">
+                <span id="online-status" class="status-indicator offline">📶</span>
+                <span id="bluetooth-status" class="status-indicator offline">📶</span>
+                <span id="location-status" class="status-indicator offline">📍</span>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-view="home">
+                <span>🏠</span>
+                <small>Home</small>
+            </button>
+            <button class="nav-item" data-view="contacts">
+                <span>👥</span>
+                <small>Contacts</small>
+            </button>
+            <button class="nav-item" data-view="settings">
+                <span>⚙️</span>
+                <small>Settings</small>
+            </button>
+        </nav>
+
+        <!-- Views -->
+        <main class="main-content">
+            <!-- Home View -->
+            <div id="home-view" class="view active">
+                <div class="emergency-section">
+                    <button id="sos-button" class="sos-button" disabled>
+                        <div class="sos-inner">
+                            <span class="sos-text">SOS</span>
+                            <span class="sos-subtext">EMERGENCY</span>
+                        </div>
+                    </button>
+                    <p class="sos-instruction">Hold for 3 seconds to activate emergency alert</p>
+                </div>
+
+                <div class="quick-actions">
+                    <button id="test-alert" class="quick-action">
+                        <span>🧪</span>
+                        <span>Test Alert</span>
+                    </button>
+                    <button id="location-check" class="quick-action">
+                        <span>📍</span>
+                        <span>Location Check</span>
+                    </button>
+                    <button id="audio-test" class="quick-action">
+                        <span>🎤</span>
+                        <span>Audio Test</span>
+                    </button>
+                </div>
+
+                <div class="status-panel">
+                    <h3>System Status</h3>
+                    <div class="status-items">
+                        <div class="status-item">
+                            <span class="status-label">Internet Connection:</span>
+                            <span id="internet-status">Checking...</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Bluetooth:</span>
+                            <span id="bluetooth-status-text">Checking...</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Location Services:</span>
+                            <span id="location-status-text">Checking...</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Trusted Contacts:</span>
+                            <span id="contacts-count">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contacts View -->
+            <div id="contacts-view" class="view">
+                <div class="view-header">
+                    <h2>Trusted Contacts</h2>
+                    <button id="add-contact" class="add-button">+ Add Contact</button>
+                </div>
+                
+                <div id="contacts-list" class="contacts-list">
+                    <!-- Contacts will be dynamically populated -->
+                </div>
+
+                <div class="contacts-help">
+                    <h3>How it works</h3>
+                    <ul>
+                        <li>Add trusted contacts who will receive emergency alerts</li>
+                        <li>Contacts must also have this app for Bluetooth connectivity</li>
+                        <li>Alerts work even when offline using Bluetooth</li>
+                        <li>When online, authorities are also notified</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="view">
+                <div class="view-header">
+                    <h2>Settings</h2>
+                </div>
+
+                <div class="settings-sections">
+                    <section class="settings-section">
+                        <h3>Account</h3>
+                        <div class="setting-item">
+                            <span>User ID:</span>
+                            <span id="user-id">Not logged in</span>
+                        </div>
+                        <button id="sign-in" class="settings-button">Sign In with Google</button>
+                        <button id="sign-out" class="settings-button" style="display: none;">Sign Out</button>
+                    </section>
+
+                    <section class="settings-section">
+                        <h3>Emergency Settings</h3>
+                        <div class="setting-item">
+                            <label for="sos-delay">SOS Activation Delay (seconds):</label>
+                            <input type="range" id="sos-delay" min="1" max="10" value="3">
+                            <span id="sos-delay-value">3s</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="audio-recording">
+                                <input type="checkbox" id="audio-recording" checked>
+                                Enable audio recording during emergency
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label for="location-tracking">
+                                <input type="checkbox" id="location-tracking" checked>
+                                Enable location tracking
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="settings-section">
+                        <h3>App Information</h3>
+                        <div class="setting-item">
+                            <span>Version:</span>
+                            <span>1.0.0</span>
+                        </div>
+                        <div class="setting-item">
+                            <span>Last Updated:</span>
+                            <span id="last-updated">Never</span>
+                        </div>
+                        <button id="clear-data" class="settings-button danger">Clear All Data</button>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="add-contact-modal" class="modal">
+        <div class="modal-content">
+            <h3>Add Trusted Contact</h3>
+            <form id="add-contact-form">
+                <input type="text" id="contact-name" placeholder="Contact Name" required>
+                <input type="email" id="contact-email" placeholder="Email Address" required>
+                <input type="tel" id="contact-phone" placeholder="Phone Number">
+                <div class="modal-actions">
+                    <button type="button" class="modal-cancel">Cancel</button>
+                    <button type="submit" class="modal-confirm">Add Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="emergency-modal" class="modal emergency-modal">
+        <div class="modal-content">
+            <h2>🚨 EMERGENCY ACTIVATED</h2>
+            <p>Sending alerts to trusted contacts...</p>
+            <div class="emergency-status">
+                <div class="status-item">
+                    <span>Location:</span>
+                    <span id="emergency-location">Getting location...</span>
+                </div>
+                <div class="status-item">
+                    <span>Recording:</span>
+                    <span id="emergency-recording">Starting...</span>
+                </div>
+                <div class="status-item">
+                    <span>Alerts Sent:</span>
+                    <span id="emergency-alerts">0</span>
+                </div>
+            </div>
+            <button id="cancel-emergency" class="emergency-cancel">Cancel Emergency</button>
+        </div>
+    </div>
+
+    <!-- Install Prompt -->
+    <div id="install-prompt" class="install-prompt" style="display: none;">
+        <div class="install-content">
+            <h3>Install StopitHarassment</h3>
+            <p>Install this app for faster access and better offline functionality.</p>
+            <div class="install-actions">
+                <button id="install-dismiss">Maybe Later</button>
+                <button id="install-confirm">Install Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+    <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
