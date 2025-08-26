@@ -1,4 +1,4 @@
-- 👋 Hi, I’m @AbdullahMaq
+- 👋 Hi, I’m @Abdullah Maqsood
 - 👀 I’m interested in programming and web development.
 - 🌱 I’m currently learning web development.
 - 💞️ I’m looking to collaborate on ...
